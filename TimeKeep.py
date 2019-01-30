@@ -172,7 +172,7 @@ async def dev(ctx):
         return
     global latest_clear
     latest_clear -= 60
-    await bot.say("Dev detected: {}".format("added 60 seconds"))
+    await bot.say("Dev detected: {}".format("storing extra 60 seconds"))
 
 
 @bot.command()
