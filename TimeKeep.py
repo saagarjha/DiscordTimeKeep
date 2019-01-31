@@ -23,7 +23,7 @@ async def start_timer():
 
 async def update_time_status():
     flowed_time = int(time.time() - latest_clear)
-    time_str = '{}:{}:{}'.format(int(flowed_time / 3600),  # hour
+    time_str = '{}H {}M {}S'.format(int(flowed_time / 3600),  # hour
                                  int((flowed_time % 3600) / 60),  # minutes
                                  int(flowed_time % 60))  # seconds
     await bot.change_presence(game=discord.Game(name='t!: {}'.format(time_str)))
@@ -52,8 +52,10 @@ async def start():
     embed.title = "Welcome~ "
     embed.description = ('Thank you for playing REAPER\n'
                          'in this game I store every single second for you to reap\n'
-                         'using t!reap you will take all the stored time as your own\n'
+                         'the amount of time I stored is set as my status\n'
+                         'using <t!reap> you will take all the stored time as your own\n'
                          'it will take 12 hours for you to recharge your reap\n'
+                         'feel free to @mention me to get the stored time\n'
                          'compete with others to become the TOP REAPER! Good Luck~')
     await bot.say(embed=embed)
 
@@ -204,6 +206,11 @@ async def leaderboard(ctx):
         embed.add_field(name='#{} {}'.format(i, content[i].split('|')[1][:-5]),
                         value=seconds_format(float(content[i].split('|')[2])))
     await bot.say(embed=embed)
+
+
+@bot.command(pass_context=True)
+async def stored(ctx):
+    await bot.say('Currently stored {}'.format(seconds_format(int(time.time() - latest_clear))))
 
 
 @bot.event
