@@ -17,12 +17,12 @@ CD = 43200
 
 
 class Player:
-    def __init__(representation):
+    def __init__(self, representation):
         representation = representation.split("|")
         self.id = representation[0]
         self.name = representation[1]
-        self.reaped_time = int(representation[2])
-        self.next_reap = int(representation[3])
+        self.reaped_time = float(representation[2])
+        self.next_reap = float(representation[3])
 
     def __str__(self):
         return "{}|{}|{}|{}".format(self.id, self.name, self.reaped_time, self.next_reap)
@@ -47,7 +47,7 @@ def get_latest_time():
 def hms(seconds):
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
-    return (h, m, s)
+    return h, m, s
 
 
 def seconds_format(seconds):
@@ -62,7 +62,7 @@ async def start_timer():
 
 async def update_time_status():
     flowed_time = int(time.time() - latest_clear)
-    time_str = "{}:{:02}:{:02}".format(*hms(flowed_time))
+    time_str = "{}H {:02}M {:02}S".format(*hms(flowed_time))
     await bot.change_presence(game=discord.Game(name='t!: ' + time_str))
 
 
@@ -73,7 +73,7 @@ async def on_ready():  # when ready it prints the username, id, and starts the s
     print(bot.user.id)
     print('------')
     global latest_clear
-    latest_clear = int(get_latest_time())
+    latest_clear = float(get_latest_time())
     # latest_clear = time.time()
     await start_timer()
 
@@ -97,10 +97,10 @@ async def reap(ctx):
     global latest_clear
     author_id = ctx.message.author.id
     author = ctx.message.author
-    time = int(time.time())
-    added_time = time - latest_clear
+    current_time = float(time.time())
+    added_time = current_time - latest_clear
 
-    players = get_players()
+    players = read_players()
 
     try:
         # Find the current player
@@ -118,7 +118,7 @@ async def reap(ctx):
     else:
         await bot.say('<@!{}> has added {} to their total'.format(author_id, seconds_format(added_time)))
         player.reaped_time += added_time
-        player.next_reap = time + CD
+        player.next_reap = current_time + CD
         # Strip out the last five characters (the #NNNN part)
         update_logs(str(author)[:-5], seconds_format(added_time))
 
@@ -140,18 +140,19 @@ def update_logs(author, added_time):
 @bot.command(pass_context=True)
 async def me(ctx):
     author_id = ctx.message.author.id
-    players = get_players()
+    players = read_players()
     try:
         # Find the current player
-        player = next(player for player in players if player.id == author_id)
+        player = next((index, player) for index, player in enumerate(players) if player.id == author_id)
     except StopIteration:
         # Player doesn't exist in our logs, so tell them to reap
-       await bot.say("""<@!{}> has stored 0 seconds
+        await bot.say("""<@!{}> has stored 0 seconds
                         use t!reap to get started""".format(author_id))
+        index = len(players)
 
-    time = int(time.time())
-    if time < player.next_reap:
-        next_reap = seconds_format(time.time() - player.next_reap)
+    current_time = float(time.time())
+    if current_time < player.next_reap:
+        next_reap = seconds_format(current_time - player.next_reap)
     else:
         next_reap = 'Your next reap is up'
 
@@ -159,7 +160,7 @@ async def me(ctx):
                      or {}
                      Next Reap: {}
                      Rank: {}
-                     """.format(author_id, player.reaped_time, seconds_format(player.reaped_time), next_reap, i))
+                     """.format(author_id, player.reaped_time, seconds_format(player.reaped_time), next_reap, index))
 
 
 @bot.command(pass_context=True)
@@ -202,7 +203,7 @@ async def help():
 
 @bot.command(pass_context=True)
 async def leaderboard(ctx):
-    players = get_players()[:10]
+    players = read_players()[:10]
     embed = discord.Embed(color=0x42d7f4)
     embed.title = "The current top {} are:".format(len(players))
     for index, player in enumerate(players):
