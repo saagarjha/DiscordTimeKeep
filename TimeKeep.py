@@ -3,6 +3,7 @@ import asyncio
 import math
 import pathlib
 import random
+from textwrap import dedent as fix
 import time
 from discord.ext import commands
 from DiscordTimeKeep import SecretFile
@@ -82,13 +83,13 @@ async def on_ready():  # when ready it prints the username, id, and starts the s
 async def start():
     embed = discord.Embed(color=0x42d7f4)
     embed.title = "Welcome~ "
-    embed.description = ("""Thank you for playing REAPER
-                            in this game I store every single second for you to reap
-                            the amount of time I stored is set as my status
-                            using <t!reap> you will take all the stored time as your own
-                            it will take 12 hours for you to recharge your reap
-                            feel free to @mention me to get the stored time
-                            compete with others to become the TOP REAPER! Good Luck""")
+    embed.description = (fix("""Thank you for playing REAPER
+                                in this game I store every single second for you to reap
+                                the amount of time I stored is set as my status
+                                using <t!reap> you will take all the stored time as your own
+                                it will take 12 hours for you to recharge your reap
+                                feel free to @mention me to get the stored time
+                                compete with others to become the TOP REAPER! Good Luck"""))
     await bot.say(embed=embed)
 
 
@@ -112,9 +113,9 @@ async def reap(ctx):
         players += [player]
 
     if time.time() < player.next_reap:
-        await bot.say("""Sorry, reaping is still on cooldown
-                      please wait another {} hours {} minutes and {} seconds
-                      """.format(*hms(player.next_reap - time)))
+        await bot.say(fix("""Sorry, reaping is still on cooldown
+                             please wait another {} hours {} minutes and {} seconds
+                             """.format(*hms(player.next_reap - time))))
     else:
         await bot.say('<@!{}> has added {} to their total'.format(author_id, seconds_format(added_time)))
         player.reaped_time += added_time
@@ -146,8 +147,8 @@ async def me(ctx):
         player = next((index, player) for index, player in enumerate(players) if player.id == author_id)
     except StopIteration:
         # Player doesn't exist in our logs, so tell them to reap
-        await bot.say("""<@!{}> has stored 0 seconds
-                        use t!reap to get started""".format(author_id))
+        await bot.say(fix("""<@!{}> has stored 0 seconds
+                             use t!reap to get started""".format(author_id)))
         index = len(players)
 
     current_time = float(time.time())
@@ -156,11 +157,11 @@ async def me(ctx):
     else:
         next_reap = 'Your next reap is up'
 
-    await bot.say("""<@!{}> have stored {} seconds
-                     or {}
-                     Next Reap: {}
-                     Rank: {}
-                     """.format(author_id, player.reaped_time, seconds_format(player.reaped_time), next_reap, index))
+    await bot.say(fix("""<@!{}> have stored {} seconds
+                         or {}
+                         Next Reap: {}
+                         Rank: {}
+                         """.format(author_id, player.reaped_time, seconds_format(player.reaped_time), next_reap, index)))
 
 
 @bot.command(pass_context=True)
@@ -193,11 +194,11 @@ async def dev(ctx):
 
 @bot.command()
 async def help():
-    help_str = """**t!start:** game description~
-                  **t!reap:** reap the time as your own
-                  **t!me:** see how much time you reaped
-                  **t!leaderboard:** shows who's top 10
-                  **t!log:** shows who recently reaped"""
+    help_str = fix("""**t!start:** game description~
+                      **t!reap:** reap the time as your own
+                      **t!me:** see how much time you reaped
+                      **t!leaderboard:** shows who's top 10
+                      **t!log:** shows who recently reaped""")
     await bot.say(help_str)
 
 
