@@ -23,10 +23,8 @@ async def start_timer():
 
 async def update_time_status():
     flowed_time = int(time.time() - latest_clear)
-    time_str = '{}H {}M {}S'.format(int(flowed_time / 3600),  # hour
-                                    int((flowed_time % 3600) / 60),  # minutes
-                                    int(flowed_time % 60))  # seconds
-    await bot.change_presence(game=discord.Game(name='t!: {}'.format(time_str)))
+    time_str = "{}:{:02}:{:02}".format(*hms(flowed_time))
+    await bot.change_presence(game=discord.Game(name='t!: ' + time_str))
 
 
 @bot.event
@@ -51,13 +49,13 @@ def get_latest_time():
 async def start():
     embed = discord.Embed(color=0x42d7f4)
     embed.title = "Welcome~ "
-    embed.description = ('Thank you for playing REAPER\n'
-                         'in this game I store every single second for you to reap\n'
-                         'the amount of time I stored is set as my status\n'
-                         'using <t!reap> you will take all the stored time as your own\n'
-                         'it will take 12 hours for you to recharge your reap\n'
-                         'feel free to @mention me to get the stored time\n'
-                         'compete with others to become the TOP REAPER! Good Luck~')
+    embed.description = ("""Thank you for playing REAPER
+                            in this game I store every single second for you to reap
+                            the amount of time I stored is set as my status
+                            using <t!reap> you will take all the stored time as your own
+                            it will take 12 hours for you to recharge your reap
+                            feel free to @mention me to get the stored time
+                            compete with others to become the TOP REAPER! Good Luck""")
     await bot.say(embed=embed)
 
 
@@ -80,9 +78,7 @@ async def reap(ctx):
                 flowed_time = float(s_line[3]) - float(time.time())
                 await bot.say('Sorry reaping is still on cooldown\n'
                               ' please wait another {} hours {} minutes and {} seconds'
-                              ''.format(int(flowed_time / 3600),  # hours
-                                        int((flowed_time % 3600) / 60),  # minutes
-                                        int(flowed_time % 60)))  # seconds
+                              ''.format(*hms(flowed_time)))
             else:
                 await bot.say('<@!{}> has added {} to their total'.format(author_id, seconds_format(added_time)))
                 s_line[2] = int(s_line[2]) + added_time
@@ -91,8 +87,8 @@ async def reap(ctx):
 
                 j = i - 1
                 while j > 0 and int(content[j].split('|')[2]) < s_line[2]:
-                    temp = content[j+1]
-                    content[j+1] = content[j]
+                    temp = content[j + 1]
+                    content[j + 1] = content[j]
                     content[j] = temp
                     j -= 1
                 updated = True
@@ -188,11 +184,14 @@ async def help():
     await bot.say(help_str)
 
 
+def hms(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    return (h, m, s)
+
+
 def seconds_format(seconds):
-    return '{} Hours {} Minutes {} Seconds'.format(
-        int(seconds / 3600),  # hours
-        int((seconds % 3600) / 60),  # minutes
-        int(seconds % 60))  # seconds
+    return '{} Hours {} Minutes {} Seconds'.format(*hms(seconds))
 
 
 @bot.command(pass_context=True)
