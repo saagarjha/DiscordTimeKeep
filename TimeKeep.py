@@ -51,13 +51,13 @@ def get_latest_time():
 async def start():
     embed = discord.Embed(color=0x42d7f4)
     embed.title = "Welcome~ "
-    embed.description = ('Thank you for playing REAPER\n'
-                         'in this game I store every single second for you to reap\n'
-                         'the amount of time I stored is set as my status\n'
-                         'using <t!reap> you will take all the stored time as your own\n'
-                         'it will take 12 hours for you to recharge your reap\n'
-                         'feel free to @mention me to get the stored time\n'
-                         'compete with others to become the TOP REAPER! Good Luck~')
+    embed.description = ("""Thank you for playing REAPER
+                            in this game I store every single second for you to reap
+                            the amount of time I stored is set as my status
+                            using <t!reap> you will take all the stored time as your own
+                            it will take 12 hours for you to recharge your reap
+                            feel free to @mention me to get the stored time
+                            compete with others to become the TOP REAPER! Good Luck""")
     await bot.say(embed=embed)
 
 
@@ -91,8 +91,8 @@ async def reap(ctx):
 
                 j = i - 1
                 while j > 0 and int(content[j].split('|')[2]) < s_line[2]:
-                    temp = content[j+1]
-                    content[j+1] = content[j]
+                    temp = content[j + 1]
+                    content[j + 1] = content[j]
                     content[j] = temp
                     j -= 1
                 updated = True
