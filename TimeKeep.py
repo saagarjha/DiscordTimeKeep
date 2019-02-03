@@ -80,9 +80,7 @@ async def reap(ctx):
                 flowed_time = float(s_line[3]) - float(time.time())
                 await bot.say('Sorry reaping is still on cooldown\n'
                               ' please wait another {} hours {} minutes and {} seconds'
-                              ''.format(int(flowed_time / 3600),  # hours
-                                        int((flowed_time % 3600) / 60),  # minutes
-                                        int(flowed_time % 60)))  # seconds
+                              ''.format(*hms(flowed_time)))
             else:
                 await bot.say('<@!{}> has added {} to their total'.format(author_id, seconds_format(added_time)))
                 s_line[2] = int(s_line[2]) + added_time
@@ -188,11 +186,14 @@ async def help():
     await bot.say(help_str)
 
 
+def hms(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    return (h, m, s)
+
+
 def seconds_format(seconds):
-    return '{} Hours {} Minutes {} Seconds'.format(
-        int(seconds / 3600),  # hours
-        int((seconds % 3600) / 60),  # minutes
-        int(seconds % 60))  # seconds
+    return '{} Hours {} Minutes {} Seconds'.format(*hms(seconds))
 
 
 @bot.command(pass_context=True)
