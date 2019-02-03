@@ -23,10 +23,8 @@ async def start_timer():
 
 async def update_time_status():
     flowed_time = int(time.time() - latest_clear)
-    time_str = '{}H {}M {}S'.format(int(flowed_time / 3600),  # hour
-                                    int((flowed_time % 3600) / 60),  # minutes
-                                    int(flowed_time % 60))  # seconds
-    await bot.change_presence(game=discord.Game(name='t!: {}'.format(time_str)))
+    time_str = "{}:{:02}:{:02}".format(*hms(flowed_time))
+    await bot.change_presence(game=discord.Game(name='t!: ' + time_str))
 
 
 @bot.event
