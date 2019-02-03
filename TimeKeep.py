@@ -24,8 +24,8 @@ async def start_timer():
 async def update_time_status():
     flowed_time = int(time.time() - latest_clear)
     time_str = '{}H {}M {}S'.format(int(flowed_time / 3600),  # hour
-                                 int((flowed_time % 3600) / 60),  # minutes
-                                 int(flowed_time % 60))  # seconds
+                                    int((flowed_time % 3600) / 60),  # minutes
+                                    int(flowed_time % 60))  # seconds
     await bot.change_presence(game=discord.Game(name='t!: {}'.format(time_str)))
 
 
@@ -37,6 +37,7 @@ async def on_ready():  # when ready it prints the username, id, and starts the s
     print('------')
     global latest_clear
     latest_clear = float(get_latest_time())
+    # latest_clear = time.time()
     await start_timer()
 
 
@@ -65,7 +66,6 @@ async def reap(ctx):
     global latest_clear
     author_id = ctx.message.author.id
     added_time = int(time.time() - latest_clear)
-
     # database storage
     with open("./data/playerData.txt", "r") as f:
         content = f.readlines()
@@ -108,7 +108,7 @@ async def reap(ctx):
             content[j + 1] = content[j]
             content[j] = temp
             j -= 1
-            updated = True
+        updated = True
     if updated:
         latest_clear = time.time()
         content[0] = str(time.time()) + '\n'
@@ -116,6 +116,7 @@ async def reap(ctx):
         await update_time_status()
     with open("./data/playerData.txt", "w") as f:
         f.writelines(content)
+    print("reap attempt by {}".format(ctx.message.author))
 
 
 def update_logs(author, added_time):
@@ -179,14 +180,12 @@ async def dev(ctx):
 
 @bot.command()
 async def help():
-    embed = discord.Embed(color=0x42d7f4)
-    embed.title = "available commands: "
-    embed.description = "t!start: game description~\n" \
-                        "t!reap: reap the time as your own\n" \
-                        "t!me: see how much time you reaped\n" \
-                        "t!leaderboard: shows who's top 10\n" \
-                        "t!log: shows who recently reaped\n"
-    await bot.say(embed=embed)
+    help_str = "**t!start:** game description~\n" \
+               "**t!reap:** reap the time as your own\n" \
+               "**t!me:** see how much time you reaped\n" \
+               "**t!leaderboard:** shows who's top 10\n" \
+               "**t!log:** shows who recently reaped\n"
+    await bot.say(help_str)
 
 
 def seconds_format(seconds):
@@ -202,9 +201,20 @@ async def leaderboard(ctx):
         content = f.readlines()
     embed = discord.Embed(color=0x42d7f4)
     embed.title = "Current Top 10 are!~ "
-    for i in range(1, 11):
+    size = 11
+    if len(content) < 11:
+        size = len(content)
+    for i in range(1, size):
         embed.add_field(name='#{} {}'.format(i, content[i].split('|')[1][:-5]),
                         value=seconds_format(float(content[i].split('|')[2])))
+    await bot.say(embed=embed)
+
+
+@bot.command(pass_context=True)
+async def invite(ctx):
+    embed = discord.Embed(color=0x42d7f4)
+    embed.description = \
+        "[Invite me~](https://discordapp.com/api/oauth2/authorize?client_id=538078061682229258&permissions=0&scope=bot)"
     await bot.say(embed=embed)
 
 
