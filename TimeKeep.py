@@ -4,7 +4,6 @@ import math
 import pathlib
 import random
 import time
-from textwrap import dedent as fix
 from discord.ext import commands
 from DiscordTimeKeep import SecretFile
 
@@ -84,13 +83,13 @@ async def on_ready():  # when ready it prints the username, id, and starts the s
 async def start():
     embed = discord.Embed(color=0x42d7f4)
     embed.title = "Welcome~ "
-    embed.description = (fix("""Thank you for playing REAPER
-                            in this game I store every single second for you to reap
-                            the amount of time I stored is set as my status
-                            using <t!reap> you will take all the stored time as your own
-                            it will take 12 hours for you to recharge your reap
-                            feel free to @mention me to get the stored time
-                            compete with others to become the TOP REAPER! Good Luck"""))
+    embed.description = ("""Thank you for playing REAPER
+                         in this game I store every single second for you to reap
+                         the amount of time I stored is set as my status
+                         using <t!reap> you will take all the stored time as your own
+                         it will take 12 hours for you to recharge your reap
+                         feel free to @mention me to get the stored time
+                         compete with others to become the TOP REAPER! Good Luck""")
     await bot.say(embed=embed)
 
 
@@ -160,13 +159,14 @@ async def me(ctx):
     else:
         next_reap = 'Your next reap is up'
 
-    await bot.say(fix("""<@!{}> have stored {} seconds
-                     or {}
-                     Next Reap: {}
-                     Rank: {}
-                     """.format(author_id, str(player.reaped_time)[:-2],
-                                seconds_format(player.reaped_time),
-                                next_reap, index + 1)))
+    await bot.say("""Stats of <@!{}>
+                  stored time: {} seconds
+                  or {}
+                  Next Reap: {}
+                  Rank: {}
+                  """.format(author_id, str(player.reaped_time)[:-2],
+                             seconds_format(player.reaped_time),
+                             next_reap, index + 1))
 
 
 @bot.command(pass_context=True)
@@ -199,11 +199,12 @@ async def dev(ctx):
 
 @bot.command()
 async def help():
-    help_str = fix("""**t!start:** game description~
-                  **t!reap:** reap the time as your own
-                  **t!me:** see how much time you reaped
-                  **t!leaderboard:** shows who's top 10
-                  **t!log:** shows who recently reaped""")
+    help_str = """Current Available Commands
+               **t!start:** game description~
+               **t!reap:** reap the time as your own
+               **t!me:** see how much time you reaped
+               **t!leaderboard:** shows who's top 10
+               **t!log:** shows who recently reaped"""
     await bot.say(help_str)
 
 
